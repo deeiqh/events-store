@@ -36,6 +36,7 @@ model Event {
   place String
   trade_id String
   likes_number Int
+  image Json
 
   status EvenStatus @default(SCHEDULED)
   created_at DateTime @default(now())
