@@ -20,7 +20,9 @@ model User {
 
   role UserRole @default(CLIENT)
 
-  carts Cart[]
+  orders Order[]
+  liked_events Event[]
+
   tokens Token[]
 }
 
@@ -29,50 +31,73 @@ model Event {
 
   title String
   description String
-  category String
+  category EventCategory
   date DateTime
   place String
+  trade_id String
+  likes_number Int
 
   status EvenStatus @default(SCHEDULED)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   deleted_at DateTime?
 
+  trades Trade[]
   tickets Ticket[]
-  carts Cart[]
+  likes User[]
 }
 
-model Ticket {
+model Trade {
   uuid String @id @default(uuid())
   event_id String
   nominal_price Int
   tickets_available Int
 
-  amount_per_person Int @default(1)
   zone EventZone @default(NO_APPLY)
+  tickets_per_person Int @default(1)
+  currency Currency @default(USD)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   deleted_at DateTime?
 
-  carts Cart[]
-
+  tickets Ticket[]
   event Event @relation(fields: [event_id], references: [uuid])
 }
 
-model Cart {
+model Ticket {
   uuid String @id @default(uuid())
-  ticket_id String
   event_id String
+  trade_id String
   discounts Json? // [{description: "without discount", percentage: 0, amount: 0}]
   final_price Int
   user_id String
+  order_id String
+
+  amount_of_tickets Int @default(1)
+  currency Currency @default(USD)
+  status TicketStatus @default(RESERVED)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  order Order @relation(fields: [order_id], references: [uuid])
+  trade Trade @relation(fields: [trade_id], references: [uuid])
+  event Event @relation(fields: [event_id], references: [uuid])
+}
+
+model Order {
+  uuid String @id @default(uuid())
+  user_id String
+  discounts Json? // [{description: "without discount", percentage: 0, amount: 0}]
+  final_price Int
 
   currency Currency @default(USD)
-  amount_of_tickets Int @default(1)
-  status TicketStatus @default(RESERVED)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
 
-  ticket Ticket @relation(fields: [ticket_id], references: [uuid])
-  event Event @relation(fields: [event_id], references: [uuid])
+  tickets Ticket[]
+
   user User @relation(fields: [user_id], references: [uuid])
 }
 
@@ -120,4 +145,10 @@ enum TicketStatus {
 enum Activity {
   RESET_PASSWORD
   AUTHENTICATE
+}
+
+enum EventCategory {
+  MUSIC
+  COMEDY
+  THEATER
 }
