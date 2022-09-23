@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  uuid String @id @default(uuid())
+
+  email String @unique
+  first_name String
+  last_name String
+  password String
+
+  role UserRole @default(CLIENT)
+
+  carts Cart[]
+  tokens Token[]
+}
+
+model Event {
+  uuid String @id @default(uuid())
+
+  title String
+  description String
+  category String
+  date DateTime
+  place String
+
+  status EvenStatus @default(SCHEDULED)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  tickets Ticket[]
+  carts Cart[]
+}
+
+model Ticket {
+  uuid String @id @default(uuid())
+  event_id String
+  nominal_price Int
+  tickets_available Int
+
+  amount_per_person Int @default(1)
+  zone EventZone @default(NO_APPLY)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  carts Cart[]
+
+  event Event @relation(fields: [event_id], references: [uuid])
+}
+
+model Cart {
+  uuid String @id @default(uuid())
+  ticket_id String
+  event_id String
+  discounts Json? // [{description: "without discount", percentage: 0, amount: 0}]
+  final_price Int
+  user_id String
+
+  currency Currency @default(USD)
+  amount_of_tickets Int @default(1)
+  status TicketStatus @default(RESERVED)
+
+  ticket Ticket @relation(fields: [ticket_id], references: [uuid])
+  event Event @relation(fields: [event_id], references: [uuid])
+  user User @relation(fields: [user_id], references: [uuid])
+}
+
+model Token {
+  uuid String @id @default(uuid())
+  
+  user_id String
+  activity Activity @default(AUTHENTICATE)
+  @@unique([user_id, activity])
+
+  sub String @unique @default(uuid())
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [uuid])
+}
+
+enum EventZone {
+  NO_APPLY
+  NEAR
+  FAR
+}
+
+enum UserRole {
+  CLIENT
+  MANAGER
+}
+
+enum Currency {
+  USD
+}
+
+enum EvenStatus {
+  SCHEDULED
+  CANCELED
+  LIVE
+  ENDED
+}
+
+enum TicketStatus {
+  RESERVED
+  PAID
+  CANCELED
+}
+
+enum Activity {
+  RESET_PASSWORD
+  AUTHENTICATE
+}
