@@ -34,7 +34,7 @@ model Event {
   category EventCategory
   date DateTime
   place String
-  trade_id String
+  tickets_detail_id String
   likes_number Int
   image Json
 
@@ -43,12 +43,12 @@ model Event {
   updated_at DateTime @updatedAt
   deleted_at DateTime?
 
-  trades Trade[]
+  tickets_detail Tickets_detail[]
   tickets Ticket[]
   likes User[]
 }
 
-model Trade {
+model Tickets_detail {
   uuid String @id @default(uuid())
   event_id String
   nominal_price Int
@@ -68,13 +68,13 @@ model Trade {
 model Ticket {
   uuid String @id @default(uuid())
   event_id String
-  trade_id String
+  tickets_detail_id String
   discounts Json? // [{description: "without discount", percentage: 0, amount: 0}]
   final_price Int
   user_id String
   order_id String
 
-  amount_of_tickets Int @default(1)
+  tickets_to_buy Int @default(1)
   currency Currency @default(USD)
   status TicketStatus @default(RESERVED)
   created_at DateTime @default(now())
@@ -82,7 +82,7 @@ model Ticket {
   deleted_at DateTime?
 
   order Order @relation(fields: [order_id], references: [uuid])
-  trade Trade @relation(fields: [trade_id], references: [uuid])
+  trade Tickets_detail @relation(fields: [tickets_detail_id], references: [uuid])
   event Event @relation(fields: [event_id], references: [uuid])
 }
 
@@ -91,6 +91,7 @@ model Order {
   user_id String
   discounts Json? // [{description: "without discount", percentage: 0, amount: 0}]
   final_price Int
+  status OrderStatus @default(CART)
 
   currency Currency @default(USD)
   created_at DateTime @default(now())
@@ -141,6 +142,11 @@ enum TicketStatus {
   RESERVED
   PAID
   CANCELED
+}
+
+enum OrderStatus {
+  CLOSED
+  CART
 }
 
 enum Activity {
