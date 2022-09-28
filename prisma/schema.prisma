@@ -22,6 +22,7 @@ model User {
 
   orders Order[]
   liked_events Event[]
+  created_events Event[] @relation("created_events")
 
   tokens Token[]
 }
@@ -35,9 +36,10 @@ model Event {
   date DateTime
   place String
   tickets_detail_id String
-  likes_number Int
   image Json
+  user_id String
 
+  likes_number Int @default(0)
   status EvenStatus @default(SCHEDULED)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -46,6 +48,7 @@ model Event {
   tickets_detail Tickets_detail[]
   tickets Ticket[]
   likes User[]
+  user User @relation("created_events", fields: [user_id], references: [uuid])
 }
 
 model Tickets_detail {
@@ -82,7 +85,7 @@ model Ticket {
   deleted_at DateTime?
 
   order Order @relation(fields: [order_id], references: [uuid])
-  trade Tickets_detail @relation(fields: [tickets_detail_id], references: [uuid])
+  tickets_detail Tickets_detail @relation(fields: [tickets_detail_id], references: [uuid])
   event Event @relation(fields: [event_id], references: [uuid])
 }
 

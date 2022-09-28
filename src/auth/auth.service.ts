@@ -7,9 +7,9 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { hashSync, compareSync } from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
-import { RegisterDto } from './dto/register.dto';
-import { SignInDto } from './dto/signIn.dto';
-import { TokenDto } from './dto/token.dto';
+import { RegisterDto } from './dto/request/register.dto';
+import { SignInDto } from './dto/request/signIn.dto';
+import { TokenDto } from './dto/response/token.dto';
 import { TokenService } from './token.service';
 
 @Injectable()
