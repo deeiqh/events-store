@@ -13,108 +13,119 @@ datasource db {
 model User {
   uuid String @id @default(uuid())
 
-  email String @unique
-  first_name String
-  last_name String
-  password String
+  email     String @unique
+  firstName String @map("first_name")
+  lastName  String @map("last_Name")
+  password  String
 
   role UserRole @default(CLIENT)
 
-  orders Order[]
-  liked_events Event[]
-  created_events Event[] @relation("created_events")
+  orders        Order[]
+  likedEvents   Event[]
+  createdEvents Event[] @relation("created_events")
 
   tokens Token[]
+
+  @@map("users")
 }
 
 model Event {
   uuid String @id @default(uuid())
 
-  title String
+  title       String
   description String
-  category EventCategory
-  date DateTime
-  place String
-  image Json
-  user_id String
+  category    EventCategory
+  date        DateTime
+  place       String
+  image       Json
+  userId      String        @map("user_id")
 
-  likes_number Int @default(0)
-  status EvenStatus @default(SCHEDULED)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  deleted_at DateTime?
+  status    EvenStatus @default(SCHEDULED)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  deletedAt DateTime?  @map("deleted_at")
 
-  tickets_details Tickets_detail[]
-  tickets Ticket[]
-  likes User[]
-  user User @relation("created_events", fields: [user_id], references: [uuid])
+  ticketsDetails TicketsDetail[]
+  tickets        Ticket[]
+  likes          User[]
+  user           User            @relation("created_events", fields: [userId], references: [uuid])
+
+  @@map("events")
 }
 
-model Tickets_detail {
-  uuid String @id @default(uuid())
-  event_id String
-  nominal_price Int
-  tickets_available Int
+model TicketsDetail {
+  uuid             String @id @default(uuid())
+  eventId          String @map("event_id")
+  nominalPrice     Int    @map("nominal_price")
+  ticketsAvailable Int    @map("tickets_available")
 
-  zone EventZone @default(NO_APPLY)
-  tickets_per_person Int @default(1)
-  currency Currency @default(USD)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  deleted_at DateTime?
+  zone             EventZone @default(NO_APPLY)
+  ticketsPerPerson Int       @default(1) @map("tickets_per_person")
+  currency         Currency  @default(USD)
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
 
   tickets Ticket[]
-  event Event @relation(fields: [event_id], references: [uuid])
+  event   Event    @relation(fields: [eventId], references: [uuid])
+
+  @@map("tickets_detail")
 }
 
 model Ticket {
-  uuid String @id @default(uuid())
-  event_id String
-  tickets_detail_id String
-  discounts Json? // [{description: "without discount", percentage: 0, amount: 0}]
-  final_price Int
-  order_id String
+  uuid            String @id @default(uuid())
+  eventId         String @map("event_id")
+  ticketsDetailId String @map("tickets_detail_id")
+  discounts       Json? // [{description: "without discount", percentage: 0, amount: 0}]
+  finalPrice      Int    @map("final_price")
+  orderId         String @map("order_id")
 
-  tickets_to_buy Int @default(1)
-  currency Currency @default(USD)
-  status TicketStatus @default(RESERVED)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  deleted_at DateTime?
+  ticketsToBuy Int          @default(1) @map("tickets_to_buy")
+  currency     Currency     @default(USD)
+  status       TicketStatus @default(RESERVED)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  deletedAt    DateTime?    @map("deleted_at")
 
-  order Order @relation(fields: [order_id], references: [uuid])
-  tickets_detail Tickets_detail @relation(fields: [tickets_detail_id], references: [uuid])
-  event Event @relation(fields: [event_id], references: [uuid])
+  order          Order         @relation(fields: [orderId], references: [uuid])
+  tickets_detail TicketsDetail @relation(fields: [ticketsDetailId], references: [uuid])
+  event          Event         @relation(fields: [eventId], references: [uuid])
+
+  @@map("tickets")
 }
 
 model Order {
-  uuid String @id @default(uuid())
-  user_id String
+  uuid      String @id @default(uuid())
+  userId    String @map("user_id")
   discounts Json? // [{description: "without discount", percentage: 0, amount: 0}]
-  
-  final_price Int @default(0)
-  status OrderStatus @default(CART)
-  currency Currency @default(USD)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  deleted_at DateTime?
+
+  finalPrice Int         @default(0) @map("final_price")
+  status     OrderStatus @default(CART)
+  currency   Currency    @default(USD)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  deletedAt  DateTime?   @map("deleted_at")
 
   tickets Ticket[]
 
-  user User @relation(fields: [user_id], references: [uuid])
+  user User @relation(fields: [userId], references: [uuid])
+
+  @@map("orders")
 }
 
 model Token {
   uuid String @id @default(uuid())
-  
-  user_id String
+
+  userId   String   @map("user_id")
   activity Activity @default(AUTHENTICATE)
-  @@unique([user_id, activity])
 
-  sub String @unique @default(uuid())
-  created_at DateTime @default(now())
+  sub       String   @unique @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
 
-  user User @relation(fields: [user_id], references: [uuid])
+  user User @relation(fields: [userId], references: [uuid])
+
+  @@unique([userId, activity])
+  @@map("tokens")
 }
 
 enum EventZone {

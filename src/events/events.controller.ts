@@ -44,12 +44,12 @@ export class EventsController {
     return await this.eventsService.createEvent(createEventDto, userId);
   }
 
-  @Get('/:eventId')
+  @Get(':eventId')
   async getEvent(@Param('eventId') eventId: string): Promise<RetrieveEventDto> {
     return await this.eventsService.getEvent(eventId);
   }
 
-  @Patch('/:eventId')
+  @Patch(':eventId')
   @UseGuards(AuthGuard())
   //own guard
   async updateEvent(
@@ -60,7 +60,7 @@ export class EventsController {
     return await this.eventsService.updateEvent(eventId, updateEventDto);
   }
 
-  @Delete('/:eventId')
+  @Delete(':eventId')
   @UseGuards(AuthGuard())
   //own guard
   async deleteEvent(
@@ -69,7 +69,7 @@ export class EventsController {
     return await this.eventsService.deleteEvent(eventId);
   }
 
-  @Post('/:eventId/add-to-cart')
+  @Post(':eventId/add-to-cart')
   @UseGuards(AuthGuard())
   async addToCart(
     @Param('eventId') eventId: string,
@@ -84,7 +84,7 @@ export class EventsController {
     return orderDto;
   }
 
-  @Post('/:eventId/buy')
+  @Post(':eventId/buy')
   @UseGuards(AuthGuard())
   async buyEvent(
     @Param('eventId') eventId: string,
@@ -99,14 +99,14 @@ export class EventsController {
     return await this.eventsService.buyCart(orderId);
   }
 
-  @Get('/:eventId/tickets-details')
+  @Get(':eventId/tickets-details')
   async getTicketsDetails(
     @Param('eventId') eventId: string,
   ): Promise<RetrieveTicketsDetailDto[]> {
     return await this.eventsService.getTicketsDetails(eventId);
   }
 
-  @Post('/:eventId/tickets-details')
+  @Post(':eventId/tickets-details')
   @UseGuards(AuthGuard())
   //event pwner
   async createTicketsDetail(
@@ -119,12 +119,12 @@ export class EventsController {
     );
   }
 
-  @Get('/:eventId/tickets-details/:ticketsDetailId')
+  @Get('tickets-details/:ticketsDetailId')
   async getTicketsDetail(@Param('ticketsDetailId') ticketsDetailId: string) {
     return await this.eventsService.getTicketsDetail(ticketsDetailId);
   }
 
-  @Patch('/:eventId/tickets-details/:ticketsDetailId')
+  @Patch('tickets-details/:ticketsDetailId')
   @UseGuards(AuthGuard())
   //event owner
   async updateTicketsDetail(
@@ -137,14 +137,14 @@ export class EventsController {
     );
   }
 
-  @Delete('/:eventId/tickets-details/:ticketsDetailId')
+  @Delete('tickets-details/:ticketsDetailId')
   @UseGuards(AuthGuard())
   //event owner
   async deleteTicketsDetail(@Param('ticketsDetailId') ticketsDetailId: string) {
     return await this.eventsService.deleteTicketsDetail(ticketsDetailId);
   }
 
-  @Get('/:eventId/tickets')
+  @Get(':eventId/tickets')
   @UseGuards(AuthGuard())
   //eventt owner
   async getTickets(
@@ -153,16 +153,7 @@ export class EventsController {
     return await this.eventsService.getTickets(eventId);
   }
 
-  @Get('/:eventId/tickets/:ticketId')
-  @UseGuards(AuthGuard())
-  //event owner
-  async getTicket(
-    @Param('ticketId') ticketId: string,
-  ): Promise<RetrieveTicketDto> {
-    return await this.eventsService.getTicket(ticketId);
-  }
-
-  @Post('/:eventId/like')
+  @Post(':eventId/like')
   @UseGuards(AuthGuard())
   async likeOrDislikeEvent(
     @GetUser() userId: string,
@@ -171,7 +162,7 @@ export class EventsController {
     return await this.eventsService.likeOrDislikeEvent(userId, eventId);
   }
 
-  @Post('/:eventId/likes')
+  @Post(':eventId/likes')
   async getLikes(
     @Param('eventId') eventId: string,
   ): Promise<RetrieveUserDto[]> {

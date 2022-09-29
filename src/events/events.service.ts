@@ -1,12 +1,11 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   PreconditionFailedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FilterEventDto } from './dto/request/filter.dto';
-import { EvenStatus, OrderStatus } from '@prisma/client';
+import { EvenStatus, OrderStatus, TicketStatus } from '@prisma/client';
 import { EventCategory } from '@prisma/client';
 import { RetrieveEventDto } from './dto/response/retrieve.dto';
 import { plainToInstance } from 'class-transformer';
@@ -48,7 +47,7 @@ export class EventsService {
       where,
       include: {
         user: true,
-        tickets_details: true,
+        ticketsDetails: true,
       },
     });
 
@@ -62,7 +61,7 @@ export class EventsService {
     const event = await this.prisma.event.create({
       data: {
         ...createEventDto,
-        user_id: userId,
+        userId,
       },
     });
 
@@ -76,7 +75,7 @@ export class EventsService {
       },
       include: {
         user: true,
-        tickets_details: true,
+        ticketsDetails: true,
       },
     });
 
@@ -109,7 +108,7 @@ export class EventsService {
         uuid: eventId,
       },
       data: {
-        deleted_at: new Date(),
+        deletedAt: new Date(),
       },
     });
 
@@ -123,6 +122,7 @@ export class EventsService {
   ): Promise<{ orderDto: RetrieveOrderDto; orderId: string }> {
     const order = await this.prisma.order.findMany({
       where: {
+        userId,
         status: OrderStatus.CART,
       },
     });
@@ -138,7 +138,7 @@ export class EventsService {
     } else {
       const newOrder = await this.prisma.order.create({
         data: {
-          user_id: userId,
+          userId,
         },
       });
 
@@ -148,17 +148,16 @@ export class EventsService {
     await this.prisma.ticket.create({
       data: {
         ...createTicketDto,
-        event_id: eventId,
-        user_id: userId,
-        order_id: orderId,
+        eventId,
+        orderId,
       },
     });
 
-    const ticketPrice = createTicketDto.final_price;
+    const ticketPrice = createTicketDto.finalPrice;
     const updatedOrder = await this.prisma.order.update({
       where: { uuid: orderId },
       data: {
-        final_price: {
+        finalPrice: {
           increment: ticketPrice,
         },
       },
@@ -186,10 +185,10 @@ export class EventsService {
   async getTicketsDetails(
     eventId: string,
   ): Promise<RetrieveTicketsDetailDto[]> {
-    const ticketsDetails = await this.prisma.tickets_detail.findMany({
+    const ticketsDetails = await this.prisma.ticketsDetail.findMany({
       where: {
-        event_id: eventId,
-        deleted_at: null,
+        eventId,
+        deletedAt: null,
       },
     });
 
@@ -202,7 +201,7 @@ export class EventsService {
     eventId: string,
     createTicketsDetailDto: CreateTicketsDetailDto,
   ): Promise<RetrieveTicketsDetailDto> {
-    const ticketsDetail = await this.prisma.tickets_detail.create({
+    const ticketsDetail = await this.prisma.ticketsDetail.create({
       data: {
         ...createTicketsDetailDto,
       },
@@ -213,7 +212,7 @@ export class EventsService {
   async getTicketsDetail(
     ticketsDetailId: string,
   ): Promise<RetrieveTicketsDetailDto> {
-    const ticketsDetail = await this.prisma.tickets_detail.findUnique({
+    const ticketsDetail = await this.prisma.ticketsDetail.findUnique({
       where: { uuid: ticketsDetailId },
     });
     if (!ticketsDetail) {
@@ -226,7 +225,7 @@ export class EventsService {
     ticketsDetailId: string,
     updateTicketsDetail: updateTicketsDetailDto,
   ): Promise<RetrieveTicketsDetailDto> {
-    const ticketsDetail = await this.prisma.tickets_detail.update({
+    const ticketsDetail = await this.prisma.ticketsDetail.update({
       where: { uuid: ticketsDetailId },
       data: {
         ...updateTicketsDetail,
@@ -238,10 +237,10 @@ export class EventsService {
   async deleteTicketsDetail(
     ticketsDetailId: string,
   ): Promise<RetrieveTicketsDetailDto> {
-    const ticketsDetail = await this.prisma.tickets_detail.update({
+    const ticketsDetail = await this.prisma.ticketsDetail.update({
       where: { uuid: ticketsDetailId },
       data: {
-        deleted_at: new Date(),
+        deletedAt: new Date(),
       },
     });
     return plainToInstance(RetrieveTicketsDetailDto, ticketsDetail);
@@ -250,23 +249,12 @@ export class EventsService {
   async getTickets(eventId: string): Promise<RetrieveTicketDto[]> {
     const tickets = await this.prisma.ticket.findMany({
       where: {
-        event_id: eventId,
-        deleted_at: null,
+        eventId,
+        deletedAt: null,
+        OR: [{ status: TicketStatus.RESERVED }, { status: TicketStatus.PAID }],
       },
     });
     return tickets.map((ticket) => plainToInstance(RetrieveTicketDto, ticket));
-  }
-
-  async getTicket(ticketId: string): Promise<RetrieveTicketDto> {
-    const ticket = await this.prisma.ticket.findUnique({
-      where: {
-        uuid: ticketId,
-      },
-    });
-    if (!ticket) {
-      throw new NotFoundException('Ticket not found');
-    }
-    return plainToInstance(RetrieveTicketDto, ticket);
   }
 
   async likeOrDislikeEvent(
@@ -302,9 +290,6 @@ export class EventsService {
               uuid: userId,
             },
           },
-          likes_number: {
-            increment: 1,
-          },
         },
       });
     } else {
@@ -317,9 +302,6 @@ export class EventsService {
             disconnect: {
               uuid: userId,
             },
-          },
-          likes_number: {
-            decrement: 1,
           },
         },
       });

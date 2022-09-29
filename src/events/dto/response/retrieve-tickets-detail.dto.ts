@@ -1,21 +1,22 @@
 import { EventZone } from '@prisma/client';
 import { Currency } from '@prisma/client';
 import { Transform } from 'class-transformer';
-import { RetrieveEventDto } from 'src/events/dto/response/retrieve.dto';
 
 export class RetrieveTicketsDetailDto {
-  nominal_price: number;
+  uuid: string;
 
-  tickets_available: number;
+  nominalPrice: number;
+
+  ticketsAvailable: number;
 
   zone: EventZone;
 
-  tickets_per_person: number;
+  ticketsPerPerson: number;
 
   currency: Currency;
 
   @Transform(({ value }) => value?.toISOString())
-  updated_at: Date;
+  updatedAt: Date;
 
-  event_id: string;
+  eventId: string;
 }

@@ -8,9 +8,9 @@ export class UpdateUserDto {
 
   @IsString()
   @IsOptional()
-  first_name?: string;
+  firstName?: string;
 
   @IsString()
   @IsOptional()
-  last_name?: string;
+  lastName?: string;
 }

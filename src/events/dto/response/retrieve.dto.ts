@@ -3,6 +3,8 @@ import { RetrieveTicketsDetailDto } from './retrieve-tickets-detail.dto';
 import { RetrieveUserDto } from 'src/users/dto/response/retrieve.dto';
 
 export class RetrieveEventDto {
+  uuid: string;
+
   title: string;
 
   description: string;
@@ -18,18 +20,18 @@ export class RetrieveEventDto {
 
   user: RetrieveUserDto;
 
-  likes_number: number;
+  likesNumber: number;
 
   status: string;
 
   @Transform(({ value }) => value?.toISOString())
-  created_at: Date;
+  createdAt: Date;
 
   @Transform(({ value }) => value?.toISOString())
-  updated_at: Date;
+  updatedAt: Date;
 
   @Type(() => RetrieveTicketsDetailDto)
-  tickets_detail: RetrieveTicketsDetailDto[];
+  ticketsDetail: RetrieveTicketsDetailDto[];
 
   @Type(() => RetrieveUserDto)
   likes: RetrieveUserDto[];

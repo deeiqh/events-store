@@ -4,16 +4,18 @@ import { RetrieveUserDto } from 'src/users/dto/response/retrieve.dto';
 import { RetrieveTicketDto } from './retrieve-ticket.dto';
 
 export class RetrieveOrderDto {
+  uuid: string;
+
   discounts: object; // [{description: "without discount", percentage: 0, amount: 0}]
 
-  final_price: number;
+  finalPrice: number;
 
   status: OrderStatus;
 
   currency: Currency;
 
   @Transform(({ value }) => value?.toISOString())
-  updated_at: Date;
+  updatedAt: Date;
 
   @Type(() => RetrieveTicketDto)
   tickets: RetrieveTicketDto[];

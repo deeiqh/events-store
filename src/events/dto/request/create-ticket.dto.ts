@@ -1,19 +1,21 @@
 import { Currency } from '@prisma/client';
-import { IsEnum, IsOptional, IsPositive, IsUUID } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsUUID, Min } from 'class-validator';
 
 export class CreateTicketDto {
   @IsUUID()
-  tickets_detail_id: string;
+  ticketsDetailId: string;
 
   @IsOptional()
   discounts?: object; // [{description: "without discount", percentage: 0, amount: 0}]
 
-  @IsPositive()
-  final_price: number;
+  @IsInt()
+  @Min(1)
+  finalPrice: number;
 
-  @IsPositive()
   @IsOptional()
-  tickets_to_buy?: number;
+  @IsInt()
+  @Min(1)
+  ticketsToBuy?: number;
 
   @IsOptional()
   @IsEnum(Currency)

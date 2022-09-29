@@ -23,19 +23,19 @@ CREATE TYPE "Activity" AS ENUM ('RESET_PASSWORD', 'AUTHENTICATE');
 CREATE TYPE "EventCategory" AS ENUM ('MUSIC', 'COMEDY', 'THEATER');
 
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "users" (
     "uuid" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "first_name" TEXT NOT NULL,
-    "last_name" TEXT NOT NULL,
+    "last_Name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" "UserRole" NOT NULL DEFAULT 'CLIENT',
 
-    CONSTRAINT "User_pkey" PRIMARY KEY ("uuid")
+    CONSTRAINT "users_pkey" PRIMARY KEY ("uuid")
 );
 
 -- CreateTable
-CREATE TABLE "Event" (
+CREATE TABLE "events" (
     "uuid" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -44,17 +44,16 @@ CREATE TABLE "Event" (
     "place" TEXT NOT NULL,
     "image" JSONB NOT NULL,
     "user_id" TEXT NOT NULL,
-    "likes_number" INTEGER NOT NULL DEFAULT 0,
     "status" "EvenStatus" NOT NULL DEFAULT 'SCHEDULED',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),
 
-    CONSTRAINT "Event_pkey" PRIMARY KEY ("uuid")
+    CONSTRAINT "events_pkey" PRIMARY KEY ("uuid")
 );
 
 -- CreateTable
-CREATE TABLE "Tickets_detail" (
+CREATE TABLE "tickets_detail" (
     "uuid" TEXT NOT NULL,
     "event_id" TEXT NOT NULL,
     "nominal_price" INTEGER NOT NULL,
@@ -66,11 +65,11 @@ CREATE TABLE "Tickets_detail" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),
 
-    CONSTRAINT "Tickets_detail_pkey" PRIMARY KEY ("uuid")
+    CONSTRAINT "tickets_detail_pkey" PRIMARY KEY ("uuid")
 );
 
 -- CreateTable
-CREATE TABLE "Ticket" (
+CREATE TABLE "tickets" (
     "uuid" TEXT NOT NULL,
     "event_id" TEXT NOT NULL,
     "tickets_detail_id" TEXT NOT NULL,
@@ -84,11 +83,11 @@ CREATE TABLE "Ticket" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),
 
-    CONSTRAINT "Ticket_pkey" PRIMARY KEY ("uuid")
+    CONSTRAINT "tickets_pkey" PRIMARY KEY ("uuid")
 );
 
 -- CreateTable
-CREATE TABLE "Order" (
+CREATE TABLE "orders" (
     "uuid" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "discounts" JSONB,
@@ -99,18 +98,18 @@ CREATE TABLE "Order" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),
 
-    CONSTRAINT "Order_pkey" PRIMARY KEY ("uuid")
+    CONSTRAINT "orders_pkey" PRIMARY KEY ("uuid")
 );
 
 -- CreateTable
-CREATE TABLE "Token" (
+CREATE TABLE "tokens" (
     "uuid" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "activity" "Activity" NOT NULL DEFAULT 'AUTHENTICATE',
     "sub" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "Token_pkey" PRIMARY KEY ("uuid")
+    CONSTRAINT "tokens_pkey" PRIMARY KEY ("uuid")
 );
 
 -- CreateTable
@@ -120,13 +119,13 @@ CREATE TABLE "_EventToUser" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Token_sub_key" ON "Token"("sub");
+CREATE UNIQUE INDEX "tokens_sub_key" ON "tokens"("sub");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Token_user_id_activity_key" ON "Token"("user_id", "activity");
+CREATE UNIQUE INDEX "tokens_user_id_activity_key" ON "tokens"("user_id", "activity");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_EventToUser_AB_unique" ON "_EventToUser"("A", "B");
@@ -135,28 +134,28 @@ CREATE UNIQUE INDEX "_EventToUser_AB_unique" ON "_EventToUser"("A", "B");
 CREATE INDEX "_EventToUser_B_index" ON "_EventToUser"("B");
 
 -- AddForeignKey
-ALTER TABLE "Event" ADD CONSTRAINT "Event_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "events" ADD CONSTRAINT "events_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Tickets_detail" ADD CONSTRAINT "Tickets_detail_event_id_fkey" FOREIGN KEY ("event_id") REFERENCES "Event"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tickets_detail" ADD CONSTRAINT "tickets_detail_event_id_fkey" FOREIGN KEY ("event_id") REFERENCES "events"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Order"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tickets" ADD CONSTRAINT "tickets_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "orders"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_tickets_detail_id_fkey" FOREIGN KEY ("tickets_detail_id") REFERENCES "Tickets_detail"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tickets" ADD CONSTRAINT "tickets_tickets_detail_id_fkey" FOREIGN KEY ("tickets_detail_id") REFERENCES "tickets_detail"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_event_id_fkey" FOREIGN KEY ("event_id") REFERENCES "Event"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tickets" ADD CONSTRAINT "tickets_event_id_fkey" FOREIGN KEY ("event_id") REFERENCES "events"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "orders" ADD CONSTRAINT "orders_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Token" ADD CONSTRAINT "Token_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "tokens" ADD CONSTRAINT "tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("uuid") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_EventToUser" ADD CONSTRAINT "_EventToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "Event"("uuid") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_EventToUser" ADD CONSTRAINT "_EventToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "events"("uuid") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_EventToUser" ADD CONSTRAINT "_EventToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("uuid") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_EventToUser" ADD CONSTRAINT "_EventToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "users"("uuid") ON DELETE CASCADE ON UPDATE CASCADE;

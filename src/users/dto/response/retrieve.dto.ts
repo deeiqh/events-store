@@ -7,12 +7,12 @@ export class RetrieveUserDto {
 
   email: string;
 
-  first_name: string;
+  firstName: string;
 
-  last_name: string;
+  lastName: string;
 
   role: UserRole;
 
   @Type(() => RetrieveEventDto)
-  liked_events: RetrieveEventDto[];
+  likedEvents: RetrieveEventDto[];
 }

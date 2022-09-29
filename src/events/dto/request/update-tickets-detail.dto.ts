@@ -1,26 +1,29 @@
 import { Currency, EventZone } from '@prisma/client';
-import { IsEnum, IsOptional, IsPositive, IsUUID } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsUUID, Min } from 'class-validator';
 
 export class updateTicketsDetailDto {
   @IsUUID()
   @IsOptional()
-  event_id?: string;
+  eventId?: string;
 
-  @IsPositive()
   @IsOptional()
-  nominal_price?: number;
+  @IsInt()
+  @Min(1)
+  nominalPrice?: number;
 
-  @IsPositive()
   @IsOptional()
-  tickets_available?: number;
+  @IsInt()
+  @Min(0)
+  ticketsAvailable?: number;
 
   @IsEnum(EventZone)
   @IsOptional()
   zone?: EventZone;
 
-  @IsPositive()
   @IsOptional()
-  tickets_per_person?: number;
+  @IsInt()
+  @Min(1)
+  ticketsPerPerson?: number;
 
   @IsEnum(Currency)
   @IsOptional()

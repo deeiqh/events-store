@@ -5,7 +5,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
 } from 'class-validator';
 import { EventCategory } from '@prisma/client';
 import { Type } from 'class-transformer';
