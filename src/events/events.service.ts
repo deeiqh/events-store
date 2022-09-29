@@ -26,19 +26,19 @@ export class EventsService {
   async getEvents(filterEventDto: FilterEventDto): Promise<RetrieveEventDto[]> {
     const { category } = filterEventDto;
 
-    let where: { deleted_at: null; OR: object[]; category?: EventCategory };
+    let where: { deletedAt: null; OR: object[]; category?: EventCategory };
     if (
       category &&
       Object.values(EventCategory).includes(category as EventCategory)
     ) {
       where = {
-        deleted_at: null,
+        deletedAt: null,
         OR: [{ status: EvenStatus.SCHEDULED }, { status: EvenStatus.LIVE }],
         category: category as EventCategory,
       };
     } else {
       where = {
-        deleted_at: null,
+        deletedAt: null,
         OR: [{ status: EvenStatus.SCHEDULED }, { status: EvenStatus.LIVE }],
       };
     }

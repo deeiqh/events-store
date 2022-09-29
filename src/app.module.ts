@@ -11,7 +11,7 @@ import { EventsModule } from './events/events.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [ConfigModule, AuthModule, EventsModule, UsersModule],
+  imports: [ConfigModule.forRoot(), AuthModule, EventsModule, UsersModule],
   controllers: [AppController],
   providers: [AppService, AuthService, JwtService, PrismaService, TokenService],
 })

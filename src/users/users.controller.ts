@@ -8,6 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { PassportModule } from '@nestjs/passport';
 import { RetrieveOrderDto } from 'src/events/dto/response/retrieve-order.dtos';
 import { RetrieveTicketDto } from 'src/events/dto/response/retrieve-ticket.dto';
 import { RetrieveEventDto } from 'src/events/dto/response/retrieve.dto';

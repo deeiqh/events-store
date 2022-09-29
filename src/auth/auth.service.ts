@@ -9,7 +9,8 @@ import { hashSync, compareSync } from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/request/register.dto';
 import { SignInDto } from './dto/request/signIn.dto';
-import { TokenDto } from './dto/response/token.dto';
+import { SignOutDto } from './dto/request/sign-out.dto';
+import { RetrieveTokenDto } from './dto/response/retrieve-token.dto';
 import { TokenService } from './token.service';
 
 @Injectable()
@@ -20,10 +21,13 @@ export class AuthService {
     private tokenService: TokenService,
   ) {}
 
-  async register({ password, ...input }: RegisterDto): Promise<TokenDto> {
+  async register({
+    password,
+    ...input
+  }: RegisterDto): Promise<RetrieveTokenDto> {
     const userFound = await this.prisma.user.findUnique({
-      select: { uuid: true },
       where: { email: input.email },
+      select: { uuid: true },
     });
 
     if (userFound) {
@@ -42,7 +46,7 @@ export class AuthService {
     return tokenDto;
   }
 
-  async signIn({ email, password }: SignInDto): Promise<TokenDto> {
+  async signIn({ email, password }: SignInDto): Promise<RetrieveTokenDto> {
     const user = await this.prisma.user.findUnique({
       where: {
         email,
@@ -63,22 +67,19 @@ export class AuthService {
     return tokenDto;
   }
 
-  async signOut(tokenString: undefined | string): Promise<void> {
-    if (!tokenString) {
-      throw new PreconditionFailedException('No token received');
-    }
-
+  async signOut(signOutDto: SignOutDto): Promise<void> {
     try {
-      const { sub } = this.jwtService.verify(tokenString, {
+      const { sub } = this.jwtService.verify(signOutDto.token, {
         secret: process.env.JWT_SECRET as string,
       });
+
       await this.prisma.token.delete({
         where: {
           sub: sub as string,
         },
       });
     } catch (error) {
-      throw new PreconditionFailedException('Signed out');
+      throw new PreconditionFailedException('Wrong token');
     }
   }
 }

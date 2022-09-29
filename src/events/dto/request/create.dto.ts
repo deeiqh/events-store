@@ -1,4 +1,10 @@
-import { IsDate, IsEnum, IsJSON, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsJSON,
+  IsNotEmpty,
+  IsString,
+} from 'class-validator';
 import { EventCategory } from '@prisma/client';
 
 export class CreateEventDto {
@@ -15,7 +21,7 @@ export class CreateEventDto {
   @IsEnum(EventCategory)
   category: EventCategory;
 
-  @IsDate()
+  @IsDateString()
   date: Date;
 
   @IsString()

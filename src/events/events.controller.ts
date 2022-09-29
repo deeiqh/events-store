@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { PassportModule } from '@nestjs/passport';
 import { RetrieveOrderDto } from './dto/response/retrieve-order.dtos';
 import { CreateTicketDto } from './dto/request/create-ticket.dto';
 import { GetUser } from 'src/utils/get-user.decorator';
@@ -55,7 +56,7 @@ export class EventsController {
   async updateEvent(
     @Param('eventId') eventId: string,
     @Body() updateEventDto: UpdateEventDto,
-    //@GetUser() user_id: string,
+    //@GetUser() userId: string,
   ): Promise<RetrieveEventDto> {
     return await this.eventsService.updateEvent(eventId, updateEventDto);
   }

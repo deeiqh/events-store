@@ -15,7 +15,7 @@ model User {
 
   email     String @unique
   firstName String @map("first_name")
-  lastName  String @map("last_Name")
+  lastName  String @map("last_name")
   password  String
 
   role UserRole @default(CLIENT)
