@@ -1,7 +1,8 @@
-import { IsOptional, IsString } from 'class-validator';
+import { EventCategory } from '@prisma/client';
+import { IsEnum, IsOptional } from 'class-validator';
 
 export class FilterEventDto {
   @IsOptional()
-  @IsString()
-  category?: string;
+  @IsEnum(EventCategory)
+  category?: EventCategory;
 }

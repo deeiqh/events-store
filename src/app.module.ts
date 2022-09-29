@@ -8,9 +8,10 @@ import { AuthService } from './auth/auth.service';
 import { TokenService } from './auth/token.service';
 import { PrismaService } from './prisma/prisma.service';
 import { EventsModule } from './events/events.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [ConfigModule, AuthModule, EventsModule],
+  imports: [ConfigModule, AuthModule, EventsModule, UsersModule],
   controllers: [AppController],
   providers: [AppService, AuthService, JwtService, PrismaService, TokenService],
 })

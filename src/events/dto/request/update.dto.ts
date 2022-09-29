@@ -8,6 +8,8 @@ import {
   IsUUID,
 } from 'class-validator';
 import { EventCategory } from '@prisma/client';
+import { Type } from 'class-transformer';
+import { RetrieveTicketsDetailDto } from '../response/retrieve-tickets-detail.dto';
 
 export class UpdateEventDto {
   @IsString()
@@ -34,10 +36,6 @@ export class UpdateEventDto {
   @IsNotEmpty()
   @IsOptional()
   place?: string;
-
-  @IsUUID()
-  @IsOptional()
-  tickets_detail_id?: string;
 
   @IsJSON()
   @IsOptional()

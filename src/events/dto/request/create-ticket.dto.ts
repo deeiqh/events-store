@@ -1,7 +1,7 @@
 import { Currency } from '@prisma/client';
-import { IsOptional, IsPositive, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsOptional, IsPositive, IsUUID } from 'class-validator';
 
-export class AddToCartDto {
+export class CreateTicketDto {
   @IsUUID()
   tickets_detail_id: string;
 
@@ -11,17 +11,11 @@ export class AddToCartDto {
   @IsPositive()
   final_price: number;
 
-  @IsUUID()
-  user_id: string;
-
-  @IsUUID()
-  order_id: string;
-
   @IsPositive()
   @IsOptional()
   tickets_to_buy?: number;
 
   @IsOptional()
-  @IsOptional()
+  @IsEnum(Currency)
   currency?: Currency;
 }

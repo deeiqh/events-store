@@ -35,7 +35,6 @@ model Event {
   category EventCategory
   date DateTime
   place String
-  tickets_detail_id String
   image Json
   user_id String
 
@@ -45,7 +44,7 @@ model Event {
   updated_at DateTime @updatedAt
   deleted_at DateTime?
 
-  tickets_detail Tickets_detail[]
+  tickets_details Tickets_detail[]
   tickets Ticket[]
   likes User[]
   user User @relation("created_events", fields: [user_id], references: [uuid])
@@ -74,7 +73,6 @@ model Ticket {
   tickets_detail_id String
   discounts Json? // [{description: "without discount", percentage: 0, amount: 0}]
   final_price Int
-  user_id String
   order_id String
 
   tickets_to_buy Int @default(1)
@@ -93,9 +91,9 @@ model Order {
   uuid String @id @default(uuid())
   user_id String
   discounts Json? // [{description: "without discount", percentage: 0, amount: 0}]
-  final_price Int
+  
+  final_price Int @default(0)
   status OrderStatus @default(CART)
-
   currency Currency @default(USD)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
