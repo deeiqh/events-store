@@ -8,10 +8,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { UserRole } from '@prisma/client';
 import { RetrieveOrderDto } from 'src/events/dtos/response/retrieve-order.dtos';
 import { RetrieveTicketDto } from 'src/events/dtos/response/retrieve-ticket.dto';
 import { RetrieveEventDto } from 'src/events/dtos/response/retrieve.dto';
-import { GetUser } from 'src/utils/get-user.decorator';
+import { GetUser } from 'src/utils/decorators/get-user.decorator';
+import { Roles } from 'src/utils/decorators/roles.decorator';
+import { RolesGuard } from 'src/utils/guards/roles.guard';
 import { UpdateTicketDto } from './dtos/request/update-ticket.dto';
 import { UpdateUserDto } from './dtos/request/update.dto';
 import { RetrieveUserDto } from './dtos/response/retrieve.dto';
@@ -94,8 +97,8 @@ export class UsersController {
   }
 
   @Get(':userId/orders')
-  @UseGuards(AuthGuard())
-  //manager role
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
   async getUserOrders(
     @Param('userId') userId: string,
   ): Promise<RetrieveOrderDto[]> {
@@ -103,8 +106,8 @@ export class UsersController {
   }
 
   @Delete(':userId/orders/:orderId')
-  @UseGuards(AuthGuard())
-  //manager role
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
   async deleteUserOrder(
     @Param('orderId') orderId: string,
   ): Promise<RetrieveOrderDto> {
