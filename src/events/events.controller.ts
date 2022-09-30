@@ -10,20 +10,20 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { PassportModule } from '@nestjs/passport';
-import { RetrieveOrderDto } from './dto/response/retrieve-order.dtos';
-import { CreateTicketDto } from './dto/request/create-ticket.dto';
+import { RetrieveOrderDto } from './dtos/response/retrieve-order.dtos';
+import { CreateTicketDto } from './dtos/request/create-ticket.dto';
 import { GetUser } from 'src/utils/get-user.decorator';
-import { CreateEventDto } from './dto/request/create.dto';
-import { FilterEventDto } from './dto/request/filter.dto';
-import { UpdateEventDto } from './dto/request/update.dto';
-import { RetrieveTicketsDetailDto } from './dto/response/retrieve-tickets-detail.dto';
-import { RetrieveEventDto } from './dto/response/retrieve.dto';
+import { CreateEventDto } from './dtos/request/create.dto';
+import { FilterEventDto } from './dtos/request/filter.dto';
+import { UpdateEventDto } from './dtos/request/update.dto';
+import { RetrieveTicketsDetailDto } from './dtos/response/retrieve-tickets-detail.dto';
+import { RetrieveEventDto } from './dtos/response/retrieve.dto';
 import { EventsService } from './events.service';
-import { CreateTicketsDetailDto } from './dto/request/create-tickets-detail.dto';
-import { updateTicketsDetailDto } from './dto/request/update-tickets-detail.dto';
-import { RetrieveTicketDto } from './dto/response/retrieve-ticket.dto';
-import { RetrieveUserDto } from 'src/users/dto/response/retrieve.dto';
+import { CreateTicketsDetailDto } from './dtos/request/create-tickets-detail.dto';
+import { updateTicketsDetailDto } from './dtos/request/update-tickets-detail.dto';
+import { RetrieveTicketDto } from './dtos/response/retrieve-ticket.dto';
+import { RetrieveUserDto } from 'src/users/dtos/response/retrieve.dto';
+import { EventOwnershipGuard } from './guards/event-ownership.guard';
 
 @Controller('events')
 export class EventsController {
@@ -51,19 +51,16 @@ export class EventsController {
   }
 
   @Patch(':eventId')
-  @UseGuards(AuthGuard())
-  //own guard
+  @UseGuards(AuthGuard(), EventOwnershipGuard)
   async updateEvent(
     @Param('eventId') eventId: string,
     @Body() updateEventDto: UpdateEventDto,
-    //@GetUser() userId: string,
   ): Promise<RetrieveEventDto> {
     return await this.eventsService.updateEvent(eventId, updateEventDto);
   }
 
   @Delete(':eventId')
-  @UseGuards(AuthGuard())
-  //own guard
+  @UseGuards(AuthGuard(), EventOwnershipGuard)
   async deleteEvent(
     @Param('eventId') eventId: string,
   ): Promise<RetrieveEventDto> {
@@ -108,8 +105,7 @@ export class EventsController {
   }
 
   @Post(':eventId/tickets-details')
-  @UseGuards(AuthGuard())
-  //event pwner
+  @UseGuards(AuthGuard(), EventOwnershipGuard)
   async createTicketsDetail(
     @Param('eventId') eventId: string,
     @Body() createTicketsDetailDto: CreateTicketsDetailDto,
@@ -126,8 +122,7 @@ export class EventsController {
   }
 
   @Patch('tickets-details/:ticketsDetailId')
-  @UseGuards(AuthGuard())
-  //event owner
+  @UseGuards(AuthGuard(), EventOwnershipGuard)
   async updateTicketsDetail(
     @Param('ticketsDetailId') ticketsDetailId: string,
     @Body() updateTicketsDetail: updateTicketsDetailDto,
@@ -138,16 +133,14 @@ export class EventsController {
     );
   }
 
-  @Delete('tickets-details/:ticketsDetailId')
-  @UseGuards(AuthGuard())
-  //event owner
+  @Delete(':eventId/tickets-details/:ticketsDetailId')
+  @UseGuards(AuthGuard(), EventOwnershipGuard)
   async deleteTicketsDetail(@Param('ticketsDetailId') ticketsDetailId: string) {
     return await this.eventsService.deleteTicketsDetail(ticketsDetailId);
   }
 
   @Get(':eventId/tickets')
-  @UseGuards(AuthGuard())
-  //eventt owner
+  @UseGuards(AuthGuard(), EventOwnershipGuard)
   async getTickets(
     @Param('eventId') eventId: string,
   ): Promise<RetrieveTicketDto[]> {

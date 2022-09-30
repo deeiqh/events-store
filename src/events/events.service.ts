@@ -4,20 +4,20 @@ import {
   PreconditionFailedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FilterEventDto } from './dto/request/filter.dto';
+import { FilterEventDto } from './dtos/request/filter.dto';
 import { EvenStatus, OrderStatus, TicketStatus } from '@prisma/client';
 import { EventCategory } from '@prisma/client';
-import { RetrieveEventDto } from './dto/response/retrieve.dto';
+import { RetrieveEventDto } from './dtos/response/retrieve.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateEventDto } from './dto/request/create.dto';
-import { UpdateEventDto } from './dto/request/update.dto';
-import { CreateTicketDto } from './dto/request/create-ticket.dto';
-import { RetrieveOrderDto } from './dto/response/retrieve-order.dtos';
-import { RetrieveTicketsDetailDto } from './dto/response/retrieve-tickets-detail.dto';
-import { CreateTicketsDetailDto } from './dto/request/create-tickets-detail.dto';
-import { updateTicketsDetailDto } from './dto/request/update-tickets-detail.dto';
-import { RetrieveTicketDto } from './dto/response/retrieve-ticket.dto';
-import { RetrieveUserDto } from 'src/users/dto/response/retrieve.dto';
+import { CreateEventDto } from './dtos/request/create.dto';
+import { UpdateEventDto } from './dtos/request/update.dto';
+import { CreateTicketDto } from './dtos/request/create-ticket.dto';
+import { RetrieveOrderDto } from './dtos/response/retrieve-order.dtos';
+import { RetrieveTicketsDetailDto } from './dtos/response/retrieve-tickets-detail.dto';
+import { CreateTicketsDetailDto } from './dtos/request/create-tickets-detail.dto';
+import { updateTicketsDetailDto } from './dtos/request/update-tickets-detail.dto';
+import { RetrieveTicketDto } from './dtos/response/retrieve-ticket.dto';
+import { RetrieveUserDto } from 'src/users/dtos/response/retrieve.dto';
 
 @Injectable()
 export class EventsService {

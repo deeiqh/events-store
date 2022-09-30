@@ -7,10 +7,10 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { hashSync, compareSync } from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
-import { RegisterDto } from './dto/request/register.dto';
-import { SignInDto } from './dto/request/signIn.dto';
-import { SignOutDto } from './dto/request/sign-out.dto';
-import { RetrieveTokenDto } from './dto/response/retrieve-token.dto';
+import { RegisterDto } from './dtos/request/register.dto';
+import { SignInDto } from './dtos/request/signIn.dto';
+import { SignOutDto } from './dtos/request/sign-out.dto';
+import { RetrieveTokenDto } from './dtos/response/retrieve-token.dto';
 import { TokenService } from './token.service';
 
 @Injectable()

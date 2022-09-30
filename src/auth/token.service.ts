@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Prisma, Token } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PrismaErrors, TokenActivity } from 'src/utils/enums';
-import { RetrieveTokenDto } from './dto/response/retrieve-token.dto';
+import { RetrieveTokenDto } from './dtos/response/retrieve-token.dto';
 
 @Injectable()
 export class TokenService {

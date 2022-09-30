@@ -1,13 +1,13 @@
 import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { OrderStatus, TicketStatus } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
-import { RetrieveOrderDto } from 'src/events/dto/response/retrieve-order.dtos';
-import { RetrieveTicketDto } from 'src/events/dto/response/retrieve-ticket.dto';
-import { RetrieveEventDto } from 'src/events/dto/response/retrieve.dto';
+import { RetrieveOrderDto } from 'src/events/dtos/response/retrieve-order.dtos';
+import { RetrieveTicketDto } from 'src/events/dtos/response/retrieve-ticket.dto';
+import { RetrieveEventDto } from 'src/events/dtos/response/retrieve.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UpdateTicketDto } from './dto/request/update-ticket.dto';
-import { UpdateUserDto } from './dto/request/update.dto';
-import { RetrieveUserDto } from './dto/response/retrieve.dto';
+import { UpdateTicketDto } from './dtos/request/update-ticket.dto';
+import { UpdateUserDto } from './dtos/request/update.dto';
+import { RetrieveUserDto } from './dtos/response/retrieve.dto';
 
 @Injectable()
 export class UsersService {
