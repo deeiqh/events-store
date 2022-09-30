@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -18,7 +19,6 @@ import { RetrieveOrderDto } from './dtos/response/retrieve-order.dtos';
 import { CreateTicketDto } from './dtos/request/create-ticket.dto';
 import { GetUser } from 'src/utils/decorators/get-user.decorator';
 import { CreateEventDto } from './dtos/request/create.dto';
-import { FilterEventDto } from './dtos/request/filter.dto';
 import { UpdateEventDto } from './dtos/request/update.dto';
 import { RetrieveTicketsDetailDto } from './dtos/response/retrieve-tickets-detail.dto';
 import { RetrieveEventDto } from './dtos/response/retrieve.dto';
@@ -35,9 +35,16 @@ export class EventsController {
 
   @Get()
   async getEvents(
-    @Query() filterEventDto: FilterEventDto,
-  ): Promise<RetrieveEventDto[]> {
-    return await this.eventsService.getEvents(filterEventDto);
+    @Query() query: { category: string; take: string; cursor: string },
+  ): Promise<{
+    events: RetrieveEventDto[];
+    pagination: { take?: number; cursor?: string };
+  }> {
+    return await this.eventsService.getEvents(
+      query.category,
+      parseInt(query.take),
+      query.cursor,
+    );
   }
 
   @Post()

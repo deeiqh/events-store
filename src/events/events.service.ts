@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   PreconditionFailedException,
@@ -7,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FilterEventDto } from './dtos/request/filter.dto';
 import { EvenStatus, OrderStatus, TicketStatus } from '@prisma/client';
 import { EventCategory } from '@prisma/client';
 import { RetrieveEventDto } from './dtos/response/retrieve.dto';
@@ -29,35 +29,64 @@ export class EventsService {
     private configService: ConfigService,
   ) {}
 
-  async getEvents(filterEventDto: FilterEventDto): Promise<RetrieveEventDto[]> {
-    const { category } = filterEventDto;
-
-    let where: { deletedAt: null; OR: object[]; category?: EventCategory };
+  async getEvents(
+    category?: string,
+    take?: number,
+    cursor?: string,
+  ): Promise<{
+    events: RetrieveEventDto[];
+    pagination: { take?: number; cursor?: string };
+  }> {
     if (
       category &&
-      Object.values(EventCategory).includes(category as EventCategory)
+      !Object.values(EventCategory).includes(category as EventCategory)
     ) {
-      where = {
-        deletedAt: null,
-        OR: [{ status: EvenStatus.SCHEDULED }, { status: EvenStatus.LIVE }],
-        category: category as EventCategory,
+      throw new BadRequestException('Category not found');
+    }
+
+    let pagination;
+    if (!take) {
+      pagination = {};
+    } else if (!cursor) {
+      pagination = {
+        take,
       };
     } else {
-      where = {
-        deletedAt: null,
-        OR: [{ status: EvenStatus.SCHEDULED }, { status: EvenStatus.LIVE }],
+      pagination = {
+        take,
+        skip: 1,
+        cursor: {
+          uuid: cursor,
+        },
       };
     }
 
     const events = await this.prisma.event.findMany({
-      where,
+      where: {
+        deletedAt: null,
+        OR: [{ status: EvenStatus.SCHEDULED }, { status: EvenStatus.LIVE }],
+        category: category as EventCategory,
+      },
       include: {
         user: true,
         ticketsDetails: true,
       },
+      orderBy: [{ date: 'desc' }, { uuid: 'asc' }],
+      ...pagination,
     });
 
-    return events.map((event) => plainToInstance(RetrieveEventDto, event));
+    if (take) {
+      if (events.length === take) {
+        cursor = events[take - 1].uuid;
+      } else {
+        cursor = undefined;
+      }
+    }
+
+    return {
+      events: events.map((event) => plainToInstance(RetrieveEventDto, event)),
+      pagination: { take, cursor },
+    };
   }
 
   async createEvent(

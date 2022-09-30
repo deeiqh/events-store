@@ -27,7 +27,6 @@
     "@nestjs/jwt": "^9.0.0",
     "@nestjs/passport": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
-    "@nestjs/swagger": "^6.1.2",
     "@prisma/client": "^4.3.1",
     "@types/aws-sdk": "^2.7.0",
     "aws-sdk": "^2.1226.0",
