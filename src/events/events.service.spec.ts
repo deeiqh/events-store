@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import {
   BadRequestException,
+  NotFoundException,
   PreconditionFailedException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -45,6 +46,10 @@ describe('EventsService', () => {
   });
 
   describe('getEvents', () => {
-    // it('should throw an error if category not found', () => {});
+    it('should throw an error if category not found', async () => {
+      await expect(service.getEvents('musicTheater')).rejects.toThrow(
+        new NotFoundException('Category not found'),
+      );
+    });
   });
 });
