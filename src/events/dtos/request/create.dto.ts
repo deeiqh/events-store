@@ -27,7 +27,4 @@ export class CreateEventDto {
   @IsString()
   @IsNotEmpty()
   place: string;
-
-  @IsJSON()
-  image: object;
 }

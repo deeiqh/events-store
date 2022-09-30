@@ -3,6 +3,9 @@ import {
   NotFoundException,
   PreconditionFailedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { S3 } from 'aws-sdk';
+import { v4 as uuid } from 'uuid';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FilterEventDto } from './dtos/request/filter.dto';
 import { EvenStatus, OrderStatus, TicketStatus } from '@prisma/client';
@@ -21,7 +24,10 @@ import { RetrieveUserDto } from 'src/users/dtos/response/retrieve.dto';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private configService: ConfigService,
+  ) {}
 
   async getEvents(filterEventDto: FilterEventDto): Promise<RetrieveEventDto[]> {
     const { category } = filterEventDto;
@@ -325,5 +331,34 @@ export class EventsService {
     }
 
     return event.likes.map((user) => plainToInstance(RetrieveUserDto, user));
+  }
+
+  async uploadImage(
+    eventId: string,
+    dataBuffer: Buffer,
+    filename: string,
+  ): Promise<RetrieveEventDto> {
+    const s3 = new S3();
+    const uploadResult = await s3
+      .upload({
+        Bucket: this.configService.get('AWS_PUBLIC_BUCKET_NAME') as string,
+        Body: dataBuffer,
+        Key: `${uuid()}-${filename}`,
+      })
+      .promise();
+
+    const event = await this.prisma.event.update({
+      where: {
+        uuid: eventId,
+      },
+      data: {
+        image: {
+          url: uploadResult.Location,
+          key: uploadResult.Key,
+        },
+      },
+    });
+
+    return plainToInstance(RetrieveEventDto, event);
   }
 }

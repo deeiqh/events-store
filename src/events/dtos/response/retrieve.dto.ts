@@ -16,7 +16,7 @@ export class RetrieveEventDto {
 
   place: string;
 
-  image: JSON;
+  image: object;
 
   user: RetrieveUserDto;
 

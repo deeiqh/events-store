@@ -37,7 +37,7 @@ model Event {
   category    EventCategory
   date        DateTime
   place       String
-  image       Json
+  image       Json?
   userId      String        @map("user_id")
 
   status    EvenStatus @default(SCHEDULED)

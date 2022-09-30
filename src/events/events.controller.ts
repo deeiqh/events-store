@@ -7,9 +7,13 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 import { RetrieveOrderDto } from './dtos/response/retrieve-order.dtos';
 import { CreateTicketDto } from './dtos/request/create-ticket.dto';
 import { GetUser } from 'src/utils/decorators/get-user.decorator';
@@ -161,5 +165,19 @@ export class EventsController {
     @Param('eventId') eventId: string,
   ): Promise<RetrieveUserDto[]> {
     return this.eventsService.getLikes(eventId);
+  }
+
+  @Post(':eventId/upload-image')
+  @UseGuards(AuthGuard(), EventOwnershipGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadImage(
+    @Param('eventId') eventId: string,
+    @UploadedFile() image: Express.Multer.File,
+  ): Promise<RetrieveEventDto> {
+    return await this.eventsService.uploadImage(
+      eventId,
+      image.buffer,
+      image.originalname,
+    );
   }
 }

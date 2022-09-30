@@ -9,9 +9,17 @@ import { TokenService } from './auth/token.service';
 import { PrismaService } from './prisma/prisma.service';
 import { EventsModule } from './events/events.module';
 import { UsersModule } from './users/users.module';
+import { environmentValidationSchema } from './utils/validation-schemas/environment-variables.schema';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, EventsModule, UsersModule],
+  imports: [
+    ConfigModule.forRoot({
+      validationSchema: environmentValidationSchema,
+    }),
+    AuthModule,
+    EventsModule,
+    UsersModule,
+  ],
   controllers: [AppController],
   providers: [AppService, AuthService, JwtService, PrismaService, TokenService],
 })
