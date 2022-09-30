@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { Inject } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User, UserRole } from '@prisma/client';
 import { hashSync } from 'bcryptjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Factory } from './abstract.factory';
@@ -16,6 +16,7 @@ export class UserFactory extends Factory<User> {
         lastName: input.lastName ?? faker.name.lastName(),
         email: input.email ?? faker.internet.email(),
         password: hashSync(input.password ?? faker.internet.password()),
+        role: input.role ?? UserRole.CLIENT,
       },
     });
   }
