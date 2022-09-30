@@ -41,7 +41,7 @@ export class EventsService {
       category &&
       !Object.values(EventCategory).includes(category as EventCategory)
     ) {
-      throw new BadRequestException('Category not found');
+      throw new NotFoundException('Category not found');
     }
 
     let pagination;
