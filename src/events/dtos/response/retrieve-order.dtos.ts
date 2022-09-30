@@ -1,6 +1,6 @@
 import { Currency, OrderStatus } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { RetrieveUserDto } from 'src/users/dto/response/retrieve.dto';
+import { RetrieveUserDto } from 'src/users/dtos/response/retrieve.dto';
 import { RetrieveTicketDto } from './retrieve-ticket.dto';
 
 export class RetrieveOrderDto {

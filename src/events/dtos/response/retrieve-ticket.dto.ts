@@ -1,6 +1,6 @@
 import { Currency, TicketStatus } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { RetrieveTicketsDetailDto } from 'src/events/dto/response/retrieve-tickets-detail.dto';
+import { RetrieveTicketsDetailDto } from 'src/events/dtos/response/retrieve-tickets-detail.dto';
 
 export class RetrieveTicketDto {
   uuid: string;

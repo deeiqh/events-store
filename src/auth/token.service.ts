@@ -6,8 +6,8 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, Token } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaErrors, TokenActivity } from 'src/utils/enums';
-import { TokenDto } from './dto/response/token.dto';
+import { PrismaErrors, TokenActivity } from 'src/utils/enums/prisma-enums';
+import { RetrieveTokenDto } from './dtos/response/retrieve-token.dto';
 
 @Injectable()
 export class TokenService {
@@ -16,15 +16,14 @@ export class TokenService {
   async generateTokenDto(
     userId: string,
     activity = TokenActivity.AUTHENTICATE,
-    expirationMinutes = process.env.JWT_EXPIRATION_TIME_MINUTES as string,
-    secret = process.env.JWT_SECRET as string, //
-  ): Promise<TokenDto> {
+  ): Promise<RetrieveTokenDto> {
     const iat = new Date().getTime();
-    const exp = iat + parseInt(expirationMinutes) * 60 * 1000;
-
     const sub = (await this.createTokenRecord(userId, activity)).sub;
+    const token = this.jwtService.sign({ sub, iat });
 
-    const token = this.jwtService.sign({ sub, iat, exp }); //
+    const exp =
+      iat +
+      parseInt(process.env.JWT_EXPIRATION_TIME_MINUTES as string) * 60 * 1000;
     return { token, expiration: new Date(exp).toUTCString() };
   }
 
@@ -35,7 +34,7 @@ export class TokenService {
     try {
       const tokenRecord = await this.prisma.token.create({
         data: {
-          user_id: userId,
+          userId,
           activity,
         },
       });
@@ -49,13 +48,15 @@ export class TokenService {
             if (activity === TokenActivity.AUTHENTICATE) {
               await this.prisma.token.delete({
                 where: {
-                  user_id_activity: {
-                    user_id: userId,
+                  userId_activity: {
+                    userId,
                     activity,
                   },
                 },
               });
-              throw new ForbiddenException('Forbidden. Signed out');
+              throw new ForbiddenException(
+                'Forbidden signing in again. Now you are signed out.',
+              );
             }
             throw new ForbiddenException(
               'Frobidden. Has previous token to confirm the email',

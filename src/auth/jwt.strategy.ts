@@ -1,37 +1,42 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { User } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { TokenActivity } from 'src/utils/enums/prisma-enums';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private configService: ConfigService,
-    private prisma: PrismaService,
-  ) {
+  constructor(private prisma: PrismaService) {
     super({
-      secretOrKey: `configService.get('process.env.JWT_SECRET' as string)`,
+      secretOrKey: process.env.JWT_SECRET as string,
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
   }
 
-  async validate(sub: string): Promise<string> {
+  async validate(payload: any): Promise<string> {
     const tokenRecord = await this.prisma.token.findUnique({
       where: {
-        sub,
+        sub: payload.sub,
       },
       select: {
-        user_id: true,
+        userId: true,
         activity: true,
       },
     });
 
-    if (!tokenRecord?.user_id) {
-      throw new UnauthorizedException();
+    if (!tokenRecord || tokenRecord.activity !== TokenActivity.AUTHENTICATE) {
+      throw new UnauthorizedException('Invalid token');
     }
 
-    return tokenRecord.user_id;
+    if (payload.exp < new Date().getTime()) {
+      await this.prisma.token.delete({
+        where: {
+          sub: payload.sub as string,
+        },
+      });
+      throw new UnauthorizedException('Expired token. Now you are signed out');
+    }
+
+    return tokenRecord.userId;
   }
 }

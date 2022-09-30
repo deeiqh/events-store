@@ -1,6 +1,6 @@
 import { Transform, Type } from 'class-transformer';
 import { RetrieveTicketsDetailDto } from './retrieve-tickets-detail.dto';
-import { RetrieveUserDto } from 'src/users/dto/response/retrieve.dto';
+import { RetrieveUserDto } from 'src/users/dtos/response/retrieve.dto';
 
 export class RetrieveEventDto {
   uuid: string;

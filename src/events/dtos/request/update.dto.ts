@@ -1,5 +1,5 @@
 import {
-  IsDate,
+  IsDateString,
   IsEnum,
   IsJSON,
   IsNotEmpty,
@@ -27,7 +27,7 @@ export class UpdateEventDto {
   @IsOptional()
   category?: EventCategory;
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   date?: Date;
 

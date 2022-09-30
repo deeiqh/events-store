@@ -8,13 +8,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { RetrieveOrderDto } from 'src/events/dto/response/retrieve-order.dtos';
-import { RetrieveTicketDto } from 'src/events/dto/response/retrieve-ticket.dto';
-import { RetrieveEventDto } from 'src/events/dto/response/retrieve.dto';
-import { GetUser } from 'src/utils/get-user.decorator';
-import { UpdateTicketDto } from './dto/request/update-ticket.dto';
-import { UpdateUserDto } from './dto/request/update.dto';
-import { RetrieveUserDto } from './dto/response/retrieve.dto';
+import { UserRole } from '@prisma/client';
+import { RetrieveOrderDto } from 'src/events/dtos/response/retrieve-order.dtos';
+import { RetrieveTicketDto } from 'src/events/dtos/response/retrieve-ticket.dto';
+import { RetrieveEventDto } from 'src/events/dtos/response/retrieve.dto';
+import { GetUser } from 'src/utils/decorators/get-user.decorator';
+import { Roles } from 'src/utils/decorators/roles.decorator';
+import { RolesGuard } from 'src/utils/guards/roles.guard';
+import { UpdateTicketDto } from './dtos/request/update-ticket.dto';
+import { UpdateUserDto } from './dtos/request/update.dto';
+import { RetrieveUserDto } from './dtos/response/retrieve.dto';
+import { CartOwnerShip } from './guards/cart-ownership.guard';
+import { OrderOwnerShip } from './guards/order-ownership.guard';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -42,9 +47,8 @@ export class UsersController {
     return await this.usersService.getCart(userId);
   }
 
-  @Post('cart/:ticketId')
-  @UseGuards(AuthGuard())
-  //cart owner
+  @Post('me/cart/:ticketId')
+  @UseGuards(AuthGuard(), CartOwnerShip)
   async updateTicket(
     @Param('ticketId') ticketId: string,
     @Body() updateTicketDto: UpdateTicketDto,
@@ -52,9 +56,8 @@ export class UsersController {
     return await this.usersService.updateTicket(ticketId, updateTicketDto);
   }
 
-  @Delete('cart/:ticketId')
-  @UseGuards(AuthGuard())
-  //cart owner
+  @Delete('me/cart/:ticketId')
+  @UseGuards(AuthGuard(), CartOwnerShip)
   async deleteTicket(
     @Param('ticketId') ticketId: string,
   ): Promise<RetrieveTicketDto> {
@@ -62,8 +65,7 @@ export class UsersController {
   }
 
   @Post('me/cart/buy')
-  @UseGuards(AuthGuard())
-  //cart owner
+  @UseGuards(AuthGuard(), CartOwnerShip)
   async buyCart(@GetUser() userId: string): Promise<RetrieveOrderDto> {
     return await this.usersService.buyCart(userId);
   }
@@ -74,9 +76,8 @@ export class UsersController {
     return await this.usersService.getOrders(userId);
   }
 
-  @Delete('orders/:orderId')
-  @UseGuards(AuthGuard())
-  //order owner
+  @Delete('me/orders/:orderId')
+  @UseGuards(AuthGuard(), OrderOwnerShip)
   async deleteOrder(
     @Param('orderId') orderId: string,
   ): Promise<RetrieveOrderDto> {
@@ -96,17 +97,17 @@ export class UsersController {
   }
 
   @Get(':userId/orders')
-  @UseGuards(AuthGuard())
-  //manager role
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
   async getUserOrders(
     @Param('userId') userId: string,
   ): Promise<RetrieveOrderDto[]> {
     return await this.usersService.getOrders(userId);
   }
 
-  @Delete('orders/:orderId')
-  @UseGuards(AuthGuard())
-  //manager role
+  @Delete(':userId/orders/:orderId')
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
   async deleteUserOrder(
     @Param('orderId') orderId: string,
   ): Promise<RetrieveOrderDto> {
