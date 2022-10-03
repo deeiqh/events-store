@@ -1,21 +1,8 @@
-import { faker } from '@faker-js/faker';
-import {
-  BadRequestException,
-  NotFoundException,
-  PreconditionFailedException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { plainToInstance } from 'class-transformer';
-import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { TokenActivity } from 'src/utils/enums/prisma-enums';
-import { TokenFactory } from 'src/utils/factories/token.factory';
 import { UserFactory } from 'src/utils/factories/user.factory';
 import { clearDatabase } from 'src/utils/prisma/prisma.util';
-import { RegisterDto } from './dtos/request/register.dto';
-import { SignInDto } from './dtos/request/signIn.dto';
-import { TokenService } from './token.service';
 import { EventsService } from './events.service';
 import { EventFactory } from 'src/utils/factories/event.factory';
 
@@ -50,6 +37,64 @@ describe('EventsService', () => {
       await expect(service.getEvents('musicTheater')).rejects.toThrow(
         new NotFoundException('Category not found'),
       );
+    });
+
+    it('should thorw an error if wrong category', async () => {
+      await expect(service.getEvents('CULTURE')).rejects.toThrow(
+        new NotFoundException('Category not found'),
+      );
+    });
+
+    it("shouldn't do pagination if take parameter is not provided", async () => {
+      const event = await eventFactory.make();
+      const result = await service.getEvents('MUSIC');
+      expect(result).toHaveProperty('events', [{ ...event }]);
+      expect(result).toHaveProperty('pagination', {
+        take: undefined,
+        cursor: undefined,
+      });
+    });
+
+    it('should start from first record if cursor is not provided', async () => {
+      const event = await eventFactory.make();
+      const take = 3;
+
+      const result = await service.getEvents('MUSIC', take);
+
+      expect(result).toHaveProperty('events', [{ ...event }]);
+      expect(result).toHaveProperty('pagination', {
+        take: 3,
+        cursor: result.pagination.cursor,
+      });
+    });
+
+    it('should start from cursor if provided taken and cursor', async () => {
+      const event = await eventFactory.make();
+      const take = 3;
+      const cursor = await (
+        await service.getEvents('MUSIC', take)
+      ).pagination.cursor;
+
+      const result = await service.getEvents('MUSIC', take, cursor);
+
+      expect(result).toHaveProperty('events', [{ ...event }]);
+      expect(result).toHaveProperty('pagination', {
+        take: 3,
+        cursor: result.pagination.cursor,
+      });
+    });
+
+    it('should return remaining events if take is bigger, without new cursor', async () => {
+      const event = await eventFactory.make();
+      const take = 13;
+
+      const result = await service.getEvents('MUSIC', take);
+
+      expect(result).toHaveProperty('events', [{ ...event }]);
+      expect(result).toHaveProperty('pagination', {
+        take: 13,
+        cursor: undefined,
+      });
     });
   });
 });
