@@ -1,4 +1,3 @@
-import { Inject } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 export async function clearDatabase(

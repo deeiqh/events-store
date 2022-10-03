@@ -14,6 +14,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import { ApiTags, ApiResponse, ApiProperty } from '@nestjs/swagger';
 import { RetrieveOrderDto } from './dtos/response/retrieve-order.dtos';
 import { CreateTicketDto } from './dtos/request/create-ticket.dto';
 import { GetUser } from 'src/utils/decorators/get-user.decorator';
@@ -30,11 +31,27 @@ import { EventOwnershipGuard } from './guards/event-ownership.guard';
 import { Roles } from 'src/utils/decorators/roles.decorator';
 import { RolesGuard } from 'src/utils/guards/roles.guard';
 import { UserRole } from '@prisma/client';
+import { Type } from 'class-transformer';
 
+class RetrieveEventType {
+  @ApiProperty()
+  @Type(() => RetrieveEventDto)
+  events: RetrieveEventDto[];
+  @ApiProperty()
+  pagination: { take?: number; cursor?: string };
+}
+
+class RetrieveOrderType {
+  @ApiProperty()
+  order: string;
+}
+
+@ApiTags('events')
 @Controller('events')
 export class EventsController {
   constructor(private eventsService: EventsService) {}
 
+  @ApiResponse({ type: RetrieveEventType })
   @Get()
   async getEvents(
     @Query() query: { category: string; take: string; cursor: string },
@@ -49,6 +66,7 @@ export class EventsController {
     );
   }
 
+  @ApiResponse({ type: RetrieveEventDto })
   @Post()
   @Roles(UserRole.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard)
@@ -59,11 +77,13 @@ export class EventsController {
     return await this.eventsService.createEvent(createEventDto, userId);
   }
 
+  @ApiResponse({ type: RetrieveEventDto })
   @Get(':eventId')
   async getEvent(@Param('eventId') eventId: string): Promise<RetrieveEventDto> {
     return await this.eventsService.getEvent(eventId);
   }
 
+  @ApiResponse({ type: RetrieveEventDto })
   @Patch(':eventId')
   @Roles(UserRole.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
@@ -74,6 +94,7 @@ export class EventsController {
     return await this.eventsService.updateEvent(eventId, updateEventDto);
   }
 
+  @ApiResponse({ type: RetrieveEventDto })
   @Delete(':eventId')
   @Roles(UserRole.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
@@ -83,6 +104,7 @@ export class EventsController {
     return await this.eventsService.deleteEvent(eventId);
   }
 
+  @ApiResponse({ type: RetrieveOrderType })
   @Post(':eventId/add-to-cart')
   @UseGuards(AuthGuard())
   async addToCart(
@@ -98,6 +120,7 @@ export class EventsController {
     return orderDto;
   }
 
+  @ApiResponse({ type: RetrieveOrderType })
   @Post(':eventId/buy')
   @UseGuards(AuthGuard())
   async buyEvent(
@@ -113,6 +136,7 @@ export class EventsController {
     return await this.eventsService.buyCart(orderId);
   }
 
+  @ApiResponse({ type: RetrieveTicketsDetailDto })
   @Get(':eventId/tickets-details')
   async getTicketsDetails(
     @Param('eventId') eventId: string,
@@ -120,6 +144,7 @@ export class EventsController {
     return await this.eventsService.getTicketsDetails(eventId);
   }
 
+  @ApiResponse({ type: RetrieveTicketsDetailDto })
   @Post(':eventId/tickets-details')
   @Roles(UserRole.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
@@ -133,11 +158,13 @@ export class EventsController {
     );
   }
 
+  @ApiResponse({ type: RetrieveTicketsDetailDto })
   @Get('tickets-details/:ticketsDetailId')
   async getTicketsDetail(@Param('ticketsDetailId') ticketsDetailId: string) {
     return await this.eventsService.getTicketsDetail(ticketsDetailId);
   }
 
+  @ApiResponse({ type: RetrieveTicketsDetailDto })
   @Patch('tickets-details/:ticketsDetailId')
   @Roles(UserRole.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
@@ -151,6 +178,7 @@ export class EventsController {
     );
   }
 
+  @ApiResponse({ type: RetrieveTicketsDetailDto })
   @Delete(':eventId/tickets-details/:ticketsDetailId')
   @Roles(UserRole.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
@@ -158,6 +186,7 @@ export class EventsController {
     return await this.eventsService.deleteTicketsDetail(ticketsDetailId);
   }
 
+  @ApiResponse({ type: RetrieveTicketDto })
   @Get(':eventId/tickets')
   @Roles(UserRole.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
@@ -167,6 +196,7 @@ export class EventsController {
     return await this.eventsService.getTickets(eventId);
   }
 
+  @ApiResponse({ type: RetrieveEventDto })
   @Post(':eventId/like')
   @UseGuards(AuthGuard())
   async likeOrDislikeEvent(
@@ -176,6 +206,7 @@ export class EventsController {
     return await this.eventsService.likeOrDislikeEvent(userId, eventId);
   }
 
+  @ApiResponse({ type: RetrieveUserDto })
   @Post(':eventId/likes')
   async getLikes(
     @Param('eventId') eventId: string,
@@ -183,6 +214,7 @@ export class EventsController {
     return this.eventsService.getLikes(eventId);
   }
 
+  @ApiResponse({ type: RetrieveEventDto })
   @Post(':eventId/upload-image')
   @Roles(UserRole.MANAGER)
   @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
