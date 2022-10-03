@@ -20,4 +20,7 @@ export class RetrieveTicketDto {
 
   @Type(() => RetrieveTicketsDetailDto)
   ticketsDetail: RetrieveTicketsDetailDto;
+
+  @Transform(({ value }) => value?.toISOString())
+  deletedAt: Date;
 }

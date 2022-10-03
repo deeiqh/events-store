@@ -16,6 +16,8 @@ export class EventFactory extends Factory<Event> {
   async make(input: Args = {} as Args): Promise<Event> {
     return this.prisma.event.create({
       data: {
+        userId: input.userId,
+
         title: input.eventData?.title ?? faker.lorem.lines(1),
         description: input.eventData?.description ?? faker.lorem.lines(),
         category:
@@ -25,7 +27,6 @@ export class EventFactory extends Factory<Event> {
           ],
         date: input.eventData?.date ?? faker.date.recent(),
         place: input.eventData?.place ?? faker.address.city(),
-        userId: input.userId,
       },
     });
   }

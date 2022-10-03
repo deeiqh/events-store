@@ -22,4 +22,7 @@ export class RetrieveOrderDto {
 
   @Type(() => RetrieveUserDto)
   user: RetrieveUserDto;
+
+  @Transform(({ value }) => value?.toISOString())
+  deletedAt: Date;
 }
