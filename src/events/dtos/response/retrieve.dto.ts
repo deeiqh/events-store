@@ -36,4 +36,7 @@ export class RetrieveEventDto {
 
   @Type(() => RetrieveUserDto)
   likes: RetrieveUserDto[];
+
+  @Transform(({ value }) => value?.toISOString())
+  deletedAt: Date;
 }

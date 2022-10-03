@@ -19,4 +19,7 @@ export class RetrieveTicketsDetailDto {
   updatedAt: Date;
 
   eventId: string;
+
+  @Transform(({ value }) => value?.toISOString())
+  deletedAt: Date;
 }
