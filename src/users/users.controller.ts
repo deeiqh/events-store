@@ -36,7 +36,7 @@ export class UsersController {
   @UseGuards(AuthGuard())
   async updateUser(
     @GetUser() userId: string,
-    updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<RetrieveUserDto> {
     return await this.usersService.updateUser(userId, updateUserDto);
   }

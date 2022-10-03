@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -28,6 +27,9 @@ import { updateTicketsDetailDto } from './dtos/request/update-tickets-detail.dto
 import { RetrieveTicketDto } from './dtos/response/retrieve-ticket.dto';
 import { RetrieveUserDto } from 'src/users/dtos/response/retrieve.dto';
 import { EventOwnershipGuard } from './guards/event-ownership.guard';
+import { Roles } from 'src/utils/decorators/roles.decorator';
+import { RolesGuard } from 'src/utils/guards/roles.guard';
+import { UserRole } from '@prisma/client';
 
 @Controller('events')
 export class EventsController {
@@ -48,7 +50,8 @@ export class EventsController {
   }
 
   @Post()
-  @UseGuards(AuthGuard())
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard)
   async createEvent(
     @Body() createEventDto: CreateEventDto,
     @GetUser() userId: string,
@@ -62,7 +65,8 @@ export class EventsController {
   }
 
   @Patch(':eventId')
-  @UseGuards(AuthGuard(), EventOwnershipGuard)
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
   async updateEvent(
     @Param('eventId') eventId: string,
     @Body() updateEventDto: UpdateEventDto,
@@ -71,7 +75,8 @@ export class EventsController {
   }
 
   @Delete(':eventId')
-  @UseGuards(AuthGuard(), EventOwnershipGuard)
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
   async deleteEvent(
     @Param('eventId') eventId: string,
   ): Promise<RetrieveEventDto> {
@@ -116,7 +121,8 @@ export class EventsController {
   }
 
   @Post(':eventId/tickets-details')
-  @UseGuards(AuthGuard(), EventOwnershipGuard)
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
   async createTicketsDetail(
     @Param('eventId') eventId: string,
     @Body() createTicketsDetailDto: CreateTicketsDetailDto,
@@ -133,7 +139,8 @@ export class EventsController {
   }
 
   @Patch('tickets-details/:ticketsDetailId')
-  @UseGuards(AuthGuard(), EventOwnershipGuard)
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
   async updateTicketsDetail(
     @Param('ticketsDetailId') ticketsDetailId: string,
     @Body() updateTicketsDetail: updateTicketsDetailDto,
@@ -145,13 +152,15 @@ export class EventsController {
   }
 
   @Delete(':eventId/tickets-details/:ticketsDetailId')
-  @UseGuards(AuthGuard(), EventOwnershipGuard)
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
   async deleteTicketsDetail(@Param('ticketsDetailId') ticketsDetailId: string) {
     return await this.eventsService.deleteTicketsDetail(ticketsDetailId);
   }
 
   @Get(':eventId/tickets')
-  @UseGuards(AuthGuard(), EventOwnershipGuard)
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
   async getTickets(
     @Param('eventId') eventId: string,
   ): Promise<RetrieveTicketDto[]> {
@@ -175,7 +184,8 @@ export class EventsController {
   }
 
   @Post(':eventId/upload-image')
-  @UseGuards(AuthGuard(), EventOwnershipGuard)
+  @Roles(UserRole.MANAGER)
+  @UseGuards(AuthGuard(), RolesGuard, EventOwnershipGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
     @Param('eventId') eventId: string,
